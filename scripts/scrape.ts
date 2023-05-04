@@ -18,9 +18,7 @@ const readExcelFile = async (filename: string) => {
   return data;
 };
 
-const getFilenames = async () => {
-  return fs.readdirSync(TRANSCRIPTIONS_DIR).filter((file) => file.endsWith(".txt"));
-};
+
 
 const getTranscription = async (data: any[][]) => {
   const content = data
@@ -109,7 +107,7 @@ const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
 
 
 (async () => {
-  const data = await readExcelFile("ruta/al/archivo.xlsx"); // Reemplaza esto con la ruta de tu archivo de Excel
+  const data = await readExcelFile("./scripts/data/como_postular_platanus.csv"); // Reemplaza esto con la ruta de tu archivo de Excel
   const transcription = await getTranscription(data);
   const chunkedTranscription = await chunkTranscription(transcription, data);
 
