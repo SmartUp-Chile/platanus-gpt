@@ -3,18 +3,32 @@ import fs from "fs";
 import path from "path";
 import { encode } from "gpt-3-encoder";
 
+import XLSX from "xlsx";
+
 const CHUNK_SIZE = 200;
 const TRANSCRIPTIONS_DIR = "./scripts/data"; // Reemplaza esto con la ruta de tu carpeta de transcripciones
+
+// PLATANUS
+const readExcelFile = async (filename: string) => {
+  const workbook = XLSX.readFile(filename);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+  return data;
+};
 
 const getFilenames = async () => {
   return fs.readdirSync(TRANSCRIPTIONS_DIR).filter((file) => file.endsWith(".txt"));
 };
 
-const getTranscription = async (filename: string) => {
-  const content = fs.readFileSync(path.join(TRANSCRIPTIONS_DIR, filename), "utf-8");
+const getTranscription = async (data: any[][]) => {
+  const content = data
+    .map((row) => row.join(","))
+    .join("\r\n");
 
   let transcription: PGEssay = {
-    title: filename.replace(".txt", ""),
+    title: "Nombre del título", // Reemplaza esto con el título que desees
     url: "",
     date: "",
     thanks: "",
@@ -27,38 +41,31 @@ const getTranscription = async (filename: string) => {
   return transcription;
 };
 
-const chunkTranscription = async (transcription: PGEssay) => {
+
+const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
   console.log("chunking", transcription.title);
   const { title, url, date, thanks, content, ...chunklessSection } = transcription;
 
   let transcriptionTextChunks = [];
+  let chunkText = "";
 
-  if (encode(content).length > CHUNK_SIZE) {
-    const split = content.split("\r\n");
-    let chunkText = "";
+  for (let i = 1; i < data.length; i++) { // Comienza en 1 para ignorar los encabezados
+    const row = data[i];
+    const speaker = row[3];
+    const sentence = row[4];
 
-    for (let i = 0; i < split.length; i++) {
-      console.log(i)
-      const sentence = split[i];
-      const sentenceTokenLength = encode(sentence);
-      const chunkTextTokenLength = encode(chunkText).length;
+    const sentenceTokenLength = encode(sentence).length;
+    const chunkTextTokenLength = encode(chunkText).length;
 
-      if (chunkTextTokenLength + sentenceTokenLength.length > CHUNK_SIZE) {
-        transcriptionTextChunks.push(chunkText);
-        chunkText = "";
-      }
-
-      if (sentence[sentence.length - 1].match(/[a-z0-9]/i)) {
-        chunkText += sentence + " ";
-      } else {
-        chunkText += sentence + " ";
-      }
+    if (chunkTextTokenLength + sentenceTokenLength > CHUNK_SIZE || (i > 1 && speaker !== data[i - 1][3])) {
+      transcriptionTextChunks.push(chunkText);
+      chunkText = "";
     }
 
-    transcriptionTextChunks.push(chunkText.trim());
-  } else {
-    transcriptionTextChunks.push(content.trim());
+    chunkText += sentence + " ";
   }
+
+  transcriptionTextChunks.push(chunkText.trim());
 
   const transcriptionChunks = transcriptionTextChunks.map((text) => {
     const trimmedText = text.trim();
@@ -100,16 +107,17 @@ const chunkTranscription = async (transcription: PGEssay) => {
   return chunkedSection;
 };
 
+
 (async () => {
-  const filenames = await getFilenames();
+  const data = await readExcelFile("ruta/al/archivo.xlsx"); // Reemplaza esto con la ruta de tu archivo de Excel
+  const transcription = await getTranscription(data);
+  const chunkedTranscription = await chunkTranscription(transcription, data);
 
-  let transcriptions = [];
+  // Añade el código necesario para agregar la transcripción fragmentada a tu objeto JSON
+  // y guarda el JSON en un archivo, como en el ejemplo original.
+  // Por ejemplo:
 
-  for (let i = 0; i < filenames.length; i++) {
-    const transcription = await getTranscription(filenames[i]);
-    const chunkedTranscription = await chunkTranscription(transcription);
-    transcriptions.push(chunkedTranscription);
-  }
+  let transcriptions = [chunkedTranscription];
 
   const json: PGJSON = {
     current_date: "2023-03-01", // Actualiza esta fecha si es necesario
