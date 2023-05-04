@@ -4,20 +4,26 @@ import path from "path";
 import { encode } from "gpt-3-encoder";
 
 import XLSX from "xlsx";
+import iconv from "iconv-lite";
+import { readFile } from "fs/promises";
 
 const CHUNK_SIZE = 200;
 const TRANSCRIPTIONS_DIR = "./scripts/data"; // Reemplaza esto con la ruta de tu carpeta de transcripciones
 
-// PLATANUS
+function convertToUTF8(input: string): string {
+  return unescape(encodeURIComponent(input));
+}
+
 const readExcelFile = async (filename: string) => {
-  const workbook = XLSX.readFile(filename);
+  const buffer = await readFile(filename);
+  const utf8Buffer = iconv.encode(iconv.decode(buffer, "ISO-8859-1"), "UTF-8");
+  const workbook = XLSX.read(utf8Buffer, { type: "buffer" });
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
   const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
   return data;
 };
-
 
 
 const getTranscription = async (data: any[][]) => {
@@ -50,7 +56,7 @@ const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
   for (let i = 1; i < data.length; i++) { // Comienza en 1 para ignorar los encabezados
     const row = data[i];
     const speaker = row[3];
-    const sentence = row[4];
+    const sentence = convertToUTF8(row[4]);
 
     const sentenceTokenLength = encode(sentence).length;
     const chunkTextTokenLength = encode(chunkText).length;
@@ -126,5 +132,5 @@ const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
     essays: transcriptions,
   };
 
-  fs.writeFileSync("scripts/transcriptions.json", JSON.stringify(json));
+  fs.writeFileSync("scripts/transcriptions.json", JSON.stringify(json), { encoding: "utf8" });
 })();
