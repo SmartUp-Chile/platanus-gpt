@@ -7,17 +7,27 @@ import XLSX from "xlsx";
 import iconv from "iconv-lite";
 import { readFile } from "fs/promises";
 
+
 const CHUNK_SIZE = 200;
 const TRANSCRIPTIONS_DIR = "./scripts/data"; // Reemplaza esto con la ruta de tu carpeta de transcripciones
 
+
 function convertToUTF8(input: string): string {
-  return unescape(encodeURIComponent(input));
+  const buffer = iconv.encode(input, "ISO-8859-1");
+  return iconv.decode(buffer, "utf-8");
 }
+
 
 const readExcelFile = async (filename: string) => {
   const buffer = await readFile(filename);
-  const utf8Buffer = iconv.encode(iconv.decode(buffer, "ISO-8859-1"), "UTF-8");
-  const workbook = XLSX.read(utf8Buffer, { type: "buffer" });
+  const utf8Buffer = iconv.decode(buffer, "ISO-8859-1");
+
+  const workbook = XLSX.read(utf8Buffer, {
+    type: "buffer",
+    raw: false,
+    encoding: "utf-8",
+    codepage: 65001, // UTF-8 codepage
+  });
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
   const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
@@ -57,6 +67,7 @@ const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
     const row = data[i];
     const speaker = row[3];
     const sentence = convertToUTF8(row[4]);
+    console.log("chunking", i, sentence)
 
     const sentenceTokenLength = encode(sentence).length;
     const chunkTextTokenLength = encode(chunkText).length;
