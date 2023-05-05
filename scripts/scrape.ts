@@ -89,19 +89,17 @@ const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
 
   transcriptionTextChunks.push({ text: chunkText.trim(), startTime });
 
-  const transcriptionChunks = transcriptionTextChunks.map((text, index) => {
+  const transcriptionChunks = transcriptionTextChunks.map(({ text, startTime }, index) => {
     const trimmedText = text.trim();
 
-    // Buscamos el índice del texto en data y obtenemos el speaker correspondiente
-    const rowIndex = data.findIndex(row => row[4] === text);
-    const speaker = rowIndex !== -1 ? data[rowIndex][3] : '';
-    const speakerName = rowIndex !== -1 ? data[rowIndex][2] : '';
+    const speaker = data[index + 1] ? data[index + 1][3] : '';
+    const speakerName = speaker === 'SPEAKER 1' ? 'Andrés' : speaker === 'SPEAKER 2' ? 'Roger' : '';
 
-    const startTimeInSeconds = rowIndex !== -1 ? timeToSeconds(data[rowIndex][0]) : 0;
+    const startTimeInSeconds = timeToSeconds(startTime);
 
     const chunk: PGChunk = {
       essay_title: "Platanus - Cómo hacer una buena postulación a PV",
-      essay_url: `https://www.youtube.com/watch?v=wZ-VucSOZus&feature=youtu.be&t=${startTimeInSeconds}`,
+      essay_url: `https://youtu.be/wZ-VucSOZus&t=${startTimeInSeconds}`,
       essay_date: "",
       essay_thanks: speakerName,
       content: trimmedText,
@@ -112,7 +110,6 @@ const chunkTranscription = async (transcription: PGEssay, data: any[][]) => {
 
     return chunk;
   });
-
 
 
 
