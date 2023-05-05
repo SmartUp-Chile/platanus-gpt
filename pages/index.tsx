@@ -202,7 +202,7 @@ export default function Home() {
         <title>Platanus GPT</title>
         <meta
           name="description"
-          content={`Asistente de atencion al cliente segun los recursos de platanus`}
+          content={`Agente de asistencia al cliente de Platanus`}
         />
         <meta
           name="viewport"
@@ -404,7 +404,7 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <div className="mt-6 text-center text-lg">{`Asistente de atencion al cliente segun los recursos de platanus`}</div>
+              <div className="mt-6 text-center text-lg">{`Agente de asistencia al cliente de Platanus`}</div>
             )}
           </div>
         </div>
