@@ -199,10 +199,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Paul Graham GPT</title>
+        <title>Platanus GPT</title>
         <meta
           name="description"
-          content={`AI-powered search and chat for Paul Graham's essays.`}
+          content={`Asistente de atencion al cliente segun los recursos de platanus`}
         />
         <meta
           name="viewport"
@@ -359,6 +359,7 @@ export default function Home() {
                           <div>
                             <div className="font-bold text-xl">{chunk.essay_title}</div>
                             <div className="mt-1 font-bold text-sm">{chunk.essay_date}</div>
+                            <div className="mt-1 font-bold text-sm">{chunk.essay_thanks}</div>
                           </div>
                           <a
                             className="hover:opacity-50 ml-2"
@@ -385,6 +386,8 @@ export default function Home() {
                         <div>
                           <div className="font-bold text-xl">{chunk.essay_title}</div>
                           <div className="mt-1 font-bold text-sm">{chunk.essay_date}</div>
+                          <div className="mt-1 font-semibold text-sm">{chunk.essay_thanks} nos cuenta lo siguiente:</div>
+
                         </div>
                         <a
                           className="hover:opacity-50 ml-2"
@@ -401,11 +404,10 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <div className="mt-6 text-center text-lg">{`AI-powered search & chat for Paul Graham's essays.`}</div>
+              <div className="mt-6 text-center text-lg">{`Asistente de atencion al cliente segun los recursos de platanus`}</div>
             )}
           </div>
         </div>
-        <Footer />
       </div>
     </>
   );

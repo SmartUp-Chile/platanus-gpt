@@ -9,17 +9,17 @@ export const Navbar: FC = () => {
           className="hover:opacity-50"
           href="https://paul-graham-gpt.vercel.app"
         >
-          Paul Graham GPT
+          Platanus GPT
         </a>
       </div>
       <div>
         <a
           className="flex items-center hover:opacity-50"
-          href="http://www.paulgraham.com/articles.html"
+          href="https://www.platan.us"
           target="_blank"
           rel="noreferrer"
         >
-          <div className="hidden sm:flex">PaulGraham.com</div>
+          <div className="hidden sm:flex">platan.us</div>
 
           <IconExternalLink
             className="ml-1"
