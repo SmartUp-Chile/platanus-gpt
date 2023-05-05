@@ -31,7 +31,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { data: chunks, error } = await supabaseAdmin.rpc("pg_search", {
       query_embedding: embedding,
-      similarity_threshold: 0.2,
+      similarity_threshold: 0.05,
       match_count: matches
     });
 
