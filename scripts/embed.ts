@@ -28,7 +28,7 @@ const generateEmbeddings = async (essays: PGEssay[]) => {
       const [{ embedding }] = embeddingResponse.data.data;
 
       const { data, error } = await supabase
-        .from("platanus")
+        .from("pg")
         .insert({
           essay_title,
           essay_url,
