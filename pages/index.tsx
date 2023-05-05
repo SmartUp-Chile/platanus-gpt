@@ -94,7 +94,7 @@ export default function Home() {
     setChunks(results);
 
     const prompt = endent`
-    Usa los siguientes fragmentos de la serie de dudas de cultivo de Envola para responder a la conversacion: "${query}"
+    Usa los siguientes fragmentos de los episodios de Platanus Ventures para responder: "${query}"
 
     ${results?.map((d: any) => d.content).join("\n\n")}
     `;
